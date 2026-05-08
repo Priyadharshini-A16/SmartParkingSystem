@@ -2,52 +2,134 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 class Vehicle {
-    String vehicleNumber;
-    int hours;
-    double fee;
+    private String ownerName;
+    private String vehicleNumber;
+    private int parkingSlot;
+    private int hours;
 
-    Vehicle(String vehicleNumber, int hours) {
+    public Vehicle(String ownerName, String vehicleNumber, int parkingSlot, int hours) {
+        this.ownerName = ownerName;
         this.vehicleNumber = vehicleNumber;
+        this.parkingSlot = parkingSlot;
         this.hours = hours;
-        this.fee = calculateFee();
     }
 
-    double calculateFee() {
-        return hours * 20;
+    public String getOwnerName() {
+        return ownerName;
     }
 
-    void display() {
-        System.out.println("Vehicle Number : " + vehicleNumber);
-        System.out.println("Parking Hours  : " + hours);
-        System.out.println("Parking Fee    : Rs." + fee);
-        System.out.println("---------------------------");
+    public String getVehicleNumber() {
+        return vehicleNumber;
+    }
+
+    public int getParkingSlot() {
+        return parkingSlot;
+    }
+
+    public int getHours() {
+        return hours;
+    }
+
+    public int calculateBill() {
+        return hours * 50; // ₹50 per hour
     }
 }
 
-public class ParkingSystem {
+public class SmartParkingManagementSystem {
 
-    static ArrayList<Vehicle> vehicles = new ArrayList<>();
-    static Scanner sc = new Scanner(System.in);
+    static ArrayList<Vehicle> parkedVehicles = new ArrayList<>();
+    static int totalSlots = 10;
+
+    public static void parkVehicle(Scanner sc) {
+
+        if (parkedVehicles.size() >= totalSlots) {
+            System.out.println("Parking Full!");
+            return;
+        }
+
+        System.out.print("Enter Owner Name: ");
+        String owner = sc.nextLine();
+
+        System.out.print("Enter Vehicle Number: ");
+        String number = sc.nextLine();
+
+        int slot = parkedVehicles.size() + 1;
+
+        System.out.print("Enter Parking Hours: ");
+        int hours = sc.nextInt();
+        sc.nextLine();
+
+        Vehicle vehicle = new Vehicle(owner, number, slot, hours);
+        parkedVehicles.add(vehicle);
+
+        System.out.println("Vehicle Parked Successfully!");
+        System.out.println("Allocated Slot: " + slot);
+    }
+
+    public static void viewVehicles() {
+
+        if (parkedVehicles.isEmpty()) {
+            System.out.println("No Vehicles Parked.");
+            return;
+        }
+
+        System.out.println("\n--- Parked Vehicles ---");
+
+        for (Vehicle v : parkedVehicles) {
+            System.out.println("Owner Name   : " + v.getOwnerName());
+            System.out.println("Vehicle No   : " + v.getVehicleNumber());
+            System.out.println("Parking Slot : " + v.getParkingSlot());
+            System.out.println("Hours        : " + v.getHours());
+            System.out.println("Bill Amount  : ₹" + v.calculateBill());
+            System.out.println("---------------------------");
+        }
+    }
+
+    public static void removeVehicle(Scanner sc) {
+
+        System.out.print("Enter Vehicle Number to Remove: ");
+        String number = sc.nextLine();
+
+        for (Vehicle v : parkedVehicles) {
+
+            if (v.getVehicleNumber().equalsIgnoreCase(number)) {
+
+                System.out.println("Vehicle Removed Successfully!");
+                System.out.println("Total Bill: ₹" + v.calculateBill());
+
+                parkedVehicles.remove(v);
+                return;
+            }
+        }
+
+        System.out.println("Vehicle Not Found.");
+    }
+
+    public static void showAvailableSlots() {
+        System.out.println("Available Slots: " + (totalSlots - parkedVehicles.size()));
+    }
 
     public static void main(String[] args) {
 
+        Scanner sc = new Scanner(System.in);
         int choice;
 
         do {
             System.out.println("\n===== SMART PARKING MANAGEMENT SYSTEM =====");
-            System.out.println("1. Vehicle Entry");
+            System.out.println("1. Park Vehicle");
             System.out.println("2. View Parked Vehicles");
-            System.out.println("3. Total Revenue");
-            System.out.println("4. Exit");
-            System.out.print("Enter your choice: ");
+            System.out.println("3. Remove Vehicle");
+            System.out.println("4. Show Available Slots");
+            System.out.println("5. Exit");
 
+            System.out.print("Enter Choice: ");
             choice = sc.nextInt();
             sc.nextLine();
 
             switch (choice) {
 
                 case 1:
-                    addVehicle();
+                    parkVehicle(sc);
                     break;
 
                 case 2:
@@ -55,56 +137,23 @@ public class ParkingSystem {
                     break;
 
                 case 3:
-                    calculateRevenue();
+                    removeVehicle(sc);
                     break;
 
                 case 4:
-                    System.out.println("Exiting System...");
+                    showAvailableSlots();
+                    break;
+
+                case 5:
+                    System.out.println("Thank You!");
                     break;
 
                 default:
-                    System.out.println("Invalid Choice!");
+                    System.out.println("Invalid Choice.");
             }
 
-        } while (choice != 4);
-    }
+        } while (choice != 5);
 
-    static void addVehicle() {
-
-        System.out.print("Enter Vehicle Number: ");
-        String number = sc.nextLine();
-
-        System.out.print("Enter Parking Hours: ");
-        int hours = sc.nextInt();
-
-        Vehicle vehicle = new Vehicle(number, hours);
-        vehicles.add(vehicle);
-
-        System.out.println("Vehicle Added Successfully!");
-    }
-
-    static void viewVehicles() {
-
-        if (vehicles.isEmpty()) {
-            System.out.println("No Vehicles Parked.");
-            return;
-        }
-
-        System.out.println("\n===== PARKED VEHICLES =====");
-
-        for (Vehicle v : vehicles) {
-            v.display();
-        }
-    }
-
-    static void calculateRevenue() {
-
-        double total = 0;
-
-        for (Vehicle v : vehicles) {
-            total += v.fee;
-        }
-
-        System.out.println("Total Revenue : Rs." + total);
+        sc.close();
     }
 }
