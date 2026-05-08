@@ -24,7 +24,7 @@ class Vehicle {
     }
 }
 
-public class Main {
+public class ParkingSystem {
 
     static ArrayList<Vehicle> vehicles = new ArrayList<>();
     static Scanner sc = new Scanner(System.in);
